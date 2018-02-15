@@ -1,3 +1,5 @@
+package mdb;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Color;
@@ -15,10 +17,10 @@ public class Main extends JComponent
 		new Main();
 	}
 	
-	public static final int LARGEUR = 800; // Définition de la largeur de la fenetre
-	public static final int HAUTEUR = 600; // '' hauteur de la fenetre
+	public static final int LARGEUR = 640; // Définition de la largeur de la fenetre
+	public static final int HAUTEUR = 480; // '' hauteur de la fenetre
 	public static final int ITERATIONS = 100; // Définition du nombre d'itérations
-	public static final int ECHELLE = 250; // Definition de l'echelle de grandeur
+	public static final float ECHELLE = 250; // Definition de l'echelle de grandeur
 	
 	private BufferedImage buffer; // Image tampon
 	
@@ -34,6 +36,8 @@ public class Main extends JComponent
 		frame.getContentPane().add(this); // ??
 		frame.pack(); // Permet d'adapter la taille de la fenetre suivant les cas de figures
 		frame.setVisible(true); // Pour que la fenetre soit visible
+
+
 	}
 
 	@Override 
@@ -45,38 +49,32 @@ public class Main extends JComponent
 	public void mandelbrot()
 	{
 		for (int x = 0 ; x < LARGEUR ; x++)
-		{
 			for (int y = 0; y < HAUTEUR ; y++)
 			{
-				int color = calculCouleur((x - LARGEUR/2f)/100 ,(y - HAUTEUR/2f)/100);
+				int color = calculCouleur((x - LARGEUR/2f)/ECHELLE, (y - HAUTEUR/2f)/ECHELLE);
 				buffer.setRGB(x, y, color);
 			}
-		}
 	}
 	
 	public int calculCouleur(float x, float y)
 	{
-		float constanteréelle = x;
+		float constantereelle = x;
 		float constanteimaginaire = y;
 		
-		for(int n = 0; n < ITERATIONS; n++)
+		int n = 0;
+		
+		for(; n < ITERATIONS; n++)
 		{
 			//On applique la formule générale pour générer l'ensemble de Mandelbrot (z(n+1) = z(n)**2 + constante complexe
-			float nréelle = x*x -y*y + constanteréelle;
-			float nimaginaire = 2*constanteréelle*constanteimaginaire + constanteimaginaire;
-			x = nréelle;
+			float nreelle = x*x - y*y + constantereelle;
+			float nimaginaire = 2 * x * y + constanteimaginaire;
+			x = nreelle;
 			y = nimaginaire;
 			
-			if (x*x + y*y > 4) // On estime qu'un nombre complexe de module supérieur à 2 est hors de l'ensemble de Mandelbrot
-			{
-				break;
-			}
-			if(n == ITERATIONS)
-			{
-				return 0xFFFFFFFF; // blanc => dans l'ensemble
-			} 
+			if (x*x + y*y > 4) break;
 		}
-		return 0xFFFFFFFF; // noir => pas dans l'ensemble
+		if(n == ITERATIONS) return 0x00000000; // blanc => hors de l'ensemble
+		return Color.HSBtoRGB((float)n/ITERATIONS , 0.5f, 1); // noir => dans l'ensemble
 	}
 	
 	@Override
@@ -86,4 +84,6 @@ public class Main extends JComponent
 	}
 	
 	
+	// HSBtoRGB(float hue, float saturation, float brightness)
+	//Converts the components of a color, as specified by the HSB model, to an equivalent set of values for the default RGB model.
 }
